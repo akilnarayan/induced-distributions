@@ -3,7 +3,7 @@ function[x] = jacobi_primitive_inverse(u, n, alph, bet)
 %
 % Computes the inverse of the order-n induced primitive for the Jacobi
 % distribution with parameters alph and bet. Uses a bisection method in
-% conjunction with forward evaluation given by jacobi_induced_primitive.m.
+% conjunction with forward evaluation given by idist_jacobi.
 
 assert( (all(u) >= 0) && (all(u) <=1 ) );
 assert( (alph > -1) && (bet > -1) );

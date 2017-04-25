@@ -1,3 +1,5 @@
+% Demo: computes error in M-point quadrature rule for half-line Freud weights.
+
 clear
 close all
 

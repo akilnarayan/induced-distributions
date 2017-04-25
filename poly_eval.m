@@ -34,7 +34,6 @@ p = zeros([nx N+1]);
 % Flatten x
 xf = x(:);
 
-% To initialize r, we need p_0 and p_1
 p(:,1) = 1/sqrt(b(1)) * ones([nx 1]);
 if N > 0
   p(:,2) = 1/sqrt(b(2)) * (xf - a(1)).*p(:,1);
