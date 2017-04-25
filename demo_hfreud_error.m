@@ -2,44 +2,43 @@ clear
 close all
 
 % The "exact" answer
-M_exact = 1e3;
+M_exact = 1000;
 
-a = exp(1);
-b = -1/3;
-n = 2;
+alph = 1;
+rho = sqrt(1001);
+n = 595;
 
-xs = linspace(-1, 1, 201).';
+xs = linspace(0, 100, 51)';
 
-Ms = (1:10).';
+Ms = (10:25).';
 
 exact = zeros([1 numel(xs)]);
 F = zeros([numel(xs) numel(Ms)]);
 
 errors = zeros([numel(xs) numel(Ms)]);
 
-exact = idist_jacobi(xs, n, a, b, M_exact);
-for q_m = 1:length(Ms)
-  F(:,q_m) = idist_jacobi(xs, n, a, b, Ms(q_m));
-  fprintf('M = %d\n', Ms(q_m));
-end
+fprintf('Computing ''exact'' answer with M = %d...\n', M_exact);
+exact = idist_hfreud(xs, n, alph, rho, M_exact);
 
-errors = abs(F - repmat(exact, [1 length(Ms)]));
+for q_m = 1:length(Ms)
+  fprintf('M = %d...\n', Ms(q_m));
+  F(:,q_m) = idist_hfreud(xs, n, alph, rho, Ms(q_m));
+  errors(:,q_m) = abs(F(:,q_m) - exact);
+end
 
 [xx, MM] = ndgrid(xs, Ms);
 
-logerrs = log10(errors');
-logerrs(isinf(logerrs)) = -16;
-h = pcolor(xx', MM', logerrs);
+h = pcolor(xx', MM', log10(errors'));
 set(h, 'EdgeColor','none', 'xdata', xs.');
 shading interp;
 set(colorbar, 'fontsize', 16, 'fontweight', 'b');
-caxis([-16 0]);
 set(gca, 'fontsize', 16, 'fontweight', 'b');
 h = ylabel('$M$');
 set(ylabel('$\boldmath{M}$'), 'interpreter', 'latex', 'fontsize', 16);
 set(xlabel('$\boldmath{x}$'), 'interpreter', 'latex', 'fontsize', 16);
-colormap hot
+caxis([-16 0]);
 
 hold on;
-med = medapprox_jacobi(a, b, n);
-plot([med med], Ms([1 end]), 'k--', 'linewidth', 2);
+med = medapprox_hfreud(alph, rho, n);
+plot([med med], Ms([1 end]), 'k');
+colormap('hot');

@@ -32,7 +32,7 @@ Aa = alph - A;
 
 F = zeros(size(x));
 
-mrs_centroid = idist_medapprox_jacobi(alph, bet, n);
+mrs_centroid = medapprox_jacobi(alph, bet, n);
 xreflect = x > mrs_centroid;
 
 F(xreflect) = 1 - idist_jacobi(-x(xreflect), n, bet, alph, M);
