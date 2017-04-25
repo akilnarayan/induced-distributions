@@ -43,10 +43,16 @@ else
   ks = ceil( K*rand([M 1]) );
   ks(ks > K) = K;
 
-  degrees = reshape(Lambdas(ms, :), [M*d 1]);
+  degrees = reshape(Lambdas(ks, :), [M*d 1]);
 end
 
-% We need a degree count so that we can do univariate sampling
+% Basic strategy:
+%   - tabulate all univariate degrees
+%   - bin degrees
+%   - for each degree n, generate order-n idist samples
+%   - place those samples in appropriate locations
+
+% We need a max degree count so that we can do univariate sampling
 max_degree = max(Lambdas(:));
 
 [degree_sample_count, bin_indices] = histc( degrees , (0:(max_degree+1)) - 0.5 );

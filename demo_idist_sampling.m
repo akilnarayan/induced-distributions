@@ -8,6 +8,7 @@ close all
 d = 2;
 degree = 100;
 
+% Number of samples to generate
 N = 5e3;
 
 % We'll sample in batches of 1e3 to avoid generating a huge set lambdas
@@ -26,14 +27,18 @@ for m = 1:M
 
   bsize = min(batch_size, N - ((m-1)*batch_size));
 
-  lambdas = sampling_total_degree_indices(bsize, d, degree);
-
-  x2 = idist_sampling(lambdas, univ_inv);
-
   i1 = (m-1)*batch_size + 1;
-  i2 = min(m*batch_size, N);
+  i2 = i1 + bsize - 1;
 
-  r(i1:i2) = sqrt(sum(x2.^2, 2));
+  % To randomly sample indices here:
+  %lambdas = sampling_total_degree_indices(bsize, d, degree);
+  %x = idist_sampling(lambdas, univ_inv);
+
+  % Or to let idist_sampling randomly subsample indices from a list:
+  lambdas = total_degree_indices(d, degree);
+  x = idist_sampling(bsize, lambdas, univ_inv);
+
+  r(i1:i2) = sqrt(sum(x.^2, 2));
 
 end
 
@@ -42,11 +47,10 @@ u = linspace(0, 1, 1e3)';
 
 F_equil = hermite_equilibrium_distribution_conjecture(u, d);
 
+% Create an empirical CDF for plotting
 xn = sort(r)/sqrt(2*degree);
-
 yn = [ [0; xn] ...
       [xn; max(xn(N), 1)] ];
-
 Fyn = [ (0:N)'./N (0:N).'/N ];
 
 yn = reshape(yn', [2*N+2 1]);
