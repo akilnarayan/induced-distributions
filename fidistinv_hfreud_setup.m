@@ -1,16 +1,13 @@
-function[data] = fidistinv_jacobi(n, alph, bet, data)
-% data = fidistinv_jacobi(n, alph, bet, data)
-%
-% Setup computations for a Fast Induced Distribution Inverse routine for Jacobi
-% weights.
+function[data] = fidistinv_hfreud_setup(n, alph, rho, data)
+% data = fidistinv_hfreud_setup(n, alph, rho, data)
 %
 % Computes coefficients for a piecewise cubic interpolant of the degree-n
-% induced distribution for Jacobi weights. These coefficients are appended to
-% the data cell array, inside data{n+1}.
+% induced distribution for half-Freud weights. These coefficients are appended
+% to the data cell array, inside data{n+1}.
 %
 % This function also computes the "downward closed" data, that is, if
 % length(data)==k, meaning data up to degree k-1 is present, then this function
-% also computes and stores data for degrees k, k+1, ..., n.
+% computes and stores data for degrees k, k+1, ..., n.
 
 ns = length(data):n;
 if numel(ns) < 1
@@ -25,7 +22,7 @@ xtemplate = (sort(cos(pi*xtemplate)) + 1)/2;
 % Enrich with R points equidistantly in both x and u 
 R = 100;
 
-fprintf('One-time setup computations: Computing induced distribution data for...\n');
+fprintf('One-time setup computations: Computing primitive data for...\n');
 
 % Construct piecewise polynomial data
 for q = 1:length(ns)
@@ -35,37 +32,46 @@ for q = 1:length(ns)
   fprintf('n = %d...\n', nn);
   
   % The data points we'll choose are as follows:
-  % R equally spaced data on u and x space
+  % 2*nn+1 equally spaced data on u
   % Q data points on each interval bounded by zeros of p_nn (Q*(nn+1) + 1 points)
 
-  [a,b] = jacobi_recurrence(nn+1, alph, bet);
+  [a,b] = hfreud_recurrence(nn+1, alph, rho);
   x = gauss_quadrature(a, b, nn);
 
-  x = [-1; x; 1];
+
+  x = [0; x; (maxapprox_hfreud(alph, rho, nn):hfreud_tolerance(nn, alph, rho, eps)).'];
+  %x = [0; x; (half_freud_mrs_max_guess(alph, rho, n):half_freud_effective_limit(n, alph, rho, 1e-16)).'];
 
   % Create Q-1 points per interval
   xn = diff(x) * xtemplate + repmat(x(1:end-1), [1 Q-1]);
-  xn = [reshape(xn.', [numel(xn) 1]); 1];
+  xn = [reshape(xn.', [numel(xn) 1]); x(end)];
   X = numel(xn);
 
   un = zeros(size(xn));
-  un = idist_jacobi(xn, nn, alph, bet);
+  un = idist_hfreud(xn, nn, alph, rho);
+  %for qq = 1:X
+  %  un(qq) = gfreud_induced_primitive(xn(qq), nn, alph, rho);
+  %end
 
-  % Now R data points equally-spaced in u space
+  % Now nn*R data points equally-spaced in u space
   temp = linspace(0, 1, R + 2).';
   temp([1 end]) = [];
 
   un = [un; temp];
-  xn = [xn; idistinv_jacobi(temp, nn, alph, bet)];
+  %xn = [xn; gfreud_primitive_inverse(temp, nn, alph, rho)];
+  xn = [xn; idistinv_hfreud(temp, nn, alph, rho)];
 
-  % Now R data points equally-spaced in x space
-  temp = linspace(-1, 1, R+2).';
+  % Now nn*R data points equally-spaced in x space
+  temp = linspace(x(1), x(end), R+2).';
   temp([1 end]) = [];
 
   X = numel(xn);
   xn = [xn; temp];
   un = [un; zeros(size(temp))];
-  un((X+1):numel(xn)) = idist_jacobi(xn((X+1):numel(xn)), nn, alph, bet);
+  un((X+1):numel(xn)) = idist_hfreud(xn((X+1):numel(xn)), nn, alph, rho);
+  %for qq = (X+1):numel(xn);
+  %  un(qq) = gfreud_induced_primitive(xn(qq), nn, alph, rho);
+  %end
 
   % Sort
   [xn, inds] = sort(xn);

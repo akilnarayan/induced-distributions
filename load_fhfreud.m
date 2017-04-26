@@ -1,14 +1,14 @@
-function[data] = load_fjacobi(n, alph, bet)
-% [data] = load_fjacobi(n, alph, bet)
+function[data] = load_fhfreud(n, alph, rho)
+% [data] = load_fhfreud(n, alph, rho)
 %
-% Loads available data for computing induced Jacobi primitive inverses.
+% Loads available data for computing induced half-line Freud distribution inverses.
 % Attempts to load this data from the "data" subdirectory, looking for a
-% filename given by filename_jacobi.
+% filename given by filename_hfreud.
 %
 % Returns an empty cell array if either the subdirectory "data" does not exist
 % or the desired filename does not exist.
 
-filename = filename_jacobi(alph, bet);
+filename = filename_hfreud(alph, rho);
 
 if exist(filename) == 2;
   data = load(filename);
