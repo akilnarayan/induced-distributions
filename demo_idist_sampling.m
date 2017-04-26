@@ -32,11 +32,11 @@ for m = 1:M
 
   % To randomly sample indices here:
   %lambdas = sampling_total_degree_indices(bsize, d, degree);
-  %x = idist_sampling(lambdas, univ_inv);
+  %x = idist_mixture_sampling(lambdas, univ_inv);
 
-  % Or to let idist_sampling randomly subsample indices from a list:
+  % Or to let idist_mixture_sampling randomly subsample indices from a list:
   lambdas = total_degree_indices(d, degree);
-  x = idist_sampling(bsize, lambdas, univ_inv);
+  x = idist_mixture_sampling(bsize, lambdas, univ_inv);
 
   r(i1:i2) = sqrt(sum(x.^2, 2));
 

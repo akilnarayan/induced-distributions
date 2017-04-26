@@ -28,11 +28,11 @@ lambdas = total_degree_indices(d, n);
 % The original way
 univ_inv = @(uu,nn) idistinv_jacobi(uu, nn, alph, bet);
 tic;
-x2 = idist_sampling(N, lambdas, univ_inv);
+x2 = idist_mixture_sampling(N, lambdas, univ_inv);
 time2 = toc/N;
 
 % The fast way
 univ_inv = @(uu,nn) fidistinv_jacobi(uu, nn, alph, bet);
 tic;
-xf2 = idist_sampling(N, lambdas, univ_inv);
+xf2 = idist_mixture_sampling(N, lambdas, univ_inv);
 ftime2 = toc/N;

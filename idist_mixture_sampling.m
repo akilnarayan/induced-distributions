@@ -1,6 +1,6 @@
-function[x] = idist_sampling(varargin)
-% x = idist_sampling(M, Lambdas, univ_inv)
-% x = idist_sampling(Lambdas, univ_inv)
+function[x] = idist_mixture_sampling(varargin)
+% x = idist_mixture_sampling(M, Lambdas, univ_inv)
+% x = idist_mixture_sampling(Lambdas, univ_inv)
 %
 % Performs tensorial inverse transform sampling from an additive mixture of
 % tensorial induced distributions, generating M samples. The measure this
