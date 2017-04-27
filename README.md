@@ -1,5 +1,5 @@
 # induced-distributions
-Computation of induced orthogonal polynomial distributions
+Computation of induced orthogonal polynomial distributions.
 
 Evaluating distribution functions
 ---
@@ -29,8 +29,11 @@ Demos
 ---
 
 The following demo files illustrate usage of the methods above.
+- `demo_dist_jacobi.m` : Illustrates basic usage of `idist_jacobi.m`, plots induced distribution
+- `demo_hfreud_error.m` : Error plot for various quadrature sizes for half-line Freud weights. Showcases `idist_hfreud.m`
+- `demo_jacobi_error.m` : Error plot for various quadrature sizes for Jacobi weights. Showcases `idist_jacobi.m`
+- `demo_medapprox_jacobi.m` : Illustration of potential-theoretic induced distribution median versus exact median. Showcases `idistinv_jacobi.m`
+- `demo_intapprox_hfreud.m` : Illustration of potential-theoretic induced distribution support interval versus exact support interval. Showcases `idistinv_hfreud.m`
 - `demo_equilibrium_measure.m` : Empirical evidence for multivariate equilibrium measure conjecture. Showcases `idist_mixture_sampling.m`
 - `demo_fast_sampling_jacobi.m` : Usage of `idistinv_jacobi.m` versus the faster `fidistinv_jacobi.m`
 - `demo_fast_sampling_hfreud.m` : Usage of `idistinv_hfreud.m` versus the faster `fidistinv_hfreud.m`
-- `demo_hfreud_error.m` : Error plot for various quadrature sizes for half-line Freud weights. Showcases `idist_hfreud.m`
-- `demo_jacobi_error.m` : Error plot for various quadrature sizes for Jacobi weights. Showcases `idist_jacobi.m`
