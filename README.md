@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/89563355.svg)](https://zenodo.org/badge/latestdoi/89563355)
+
+
 # induced-distributions
 Computation of induced orthogonal polynomial distributions.
 
