@@ -87,6 +87,16 @@ for q = 1:length(ns)
     xn(inds) = [];
   end
 
+  % Remove identical x values
+  while true
+    inds = [false; diff(xn) <= 0];
+    if not(any(inds))
+      break
+    end
+    un(inds) = [];
+    xn(inds) = [];
+  end
+
   data{nn+1} = pchip(xn, un);
   data{nn+1}.u = un;
 
