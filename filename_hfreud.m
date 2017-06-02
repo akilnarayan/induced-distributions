@@ -8,4 +8,6 @@ function[fname] = filename_hfreud(alph, rho)
 % where "alph" and "rho" are replaced by their respective numerical
 % values. (alph and rho are given to 4 decimal places.)
 
-fname = fullfile('data', sprintf('half_freud_%.4f_%.4f.mat', alph, rho));
+fname = fileparts(mfilename('fullpath'));
+
+fname = fullfile(fname, 'data', sprintf('half_freud_%.4f_%.4f.mat', alph, rho));
