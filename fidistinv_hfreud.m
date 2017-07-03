@@ -16,13 +16,13 @@ if length(data) < max(n(:))+1
 end
 
 x = zeros(size(u));
-u = reshape(u, [numel(u) 1]);
+%u = reshape(u, [numel(u) 1]);
 
 if numel(n) > 1
   assert(numel(n) == numel(u));
 
   % Bin points with same n values
-  [nsorted, inds] = sort(n);
+  [nsorted, inds] = sort(n(:));
   indsep = find(diff(nsorted) > 0) + 1;
 else
   nsorted = n;

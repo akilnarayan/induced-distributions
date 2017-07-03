@@ -47,11 +47,13 @@ else
   %degrees = reshape(Lambdas(ks, :), [M*d 1]);
 end
 
-for j = 1:d
+x = univ_inv(rand([M d]), Lambdas);
 
-  x(:,j) = univ_inv(rand([M 1]), Lambdas(:,j));
-
-end
+%for j = 1:d
+%
+%  x(:,j) = univ_inv(rand([M 1]), Lambdas(:,j));
+%
+%end
 
 % Basic strategy:
 %   - tabulate all univariate degrees
