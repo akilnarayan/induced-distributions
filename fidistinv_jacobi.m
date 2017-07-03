@@ -1,5 +1,5 @@
-function[x] = fast_jacobi(u, n, alph, bet);
-% [x] = fast_jacobi(u, n, alph, bet)
+function[x] = fidistinv_jacobi(u, n, alph, bet);
+% [x] = fidistinv_jacobi(u, n, alph, bet)
 %
 % A Fast Induced Distribution Inverse routine for Jacobi weights.
 %
@@ -12,7 +12,7 @@ data = load_fjacobi(n, alph, bet);
 
 if length(data) < max(n(:))+1
 
-  data = fast_jacobi_setup(n, alph, bet, data);
+  data = fidistinv_jacobi_setup(max(n(:)), alph, bet, data);
   save_fjacobi(data, alph, bet);
 
 end

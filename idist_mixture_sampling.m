@@ -37,13 +37,20 @@ assert(M > 0);
 x = zeros([M d]);
 
 if nargin < 3
-  degrees = Lambdas(:);
+  %degrees = Lambdas(:);
 else
   % This selects M random samples on 1, 2, ..., K
   ks = ceil( K*rand([M 1]) );
   ks(ks > K) = K;
+  Lambdas = Lambdas(ks,:);
 
-  degrees = reshape(Lambdas(ks, :), [M*d 1]);
+  %degrees = reshape(Lambdas(ks, :), [M*d 1]);
+end
+
+for j = 1:d
+
+  x(:,j) = univ_inv(rand([M 1]), Lambdas(:,j));
+
 end
 
 % Basic strategy:
@@ -53,19 +60,19 @@ end
 %   - place those samples in appropriate locations
 
 % We need a max degree count so that we can do univariate sampling
-max_degree = max(Lambdas(:));
-
-[degree_sample_count, bin_indices] = histc( degrees , (0:(max_degree+1)) - 0.5 );
-assert(degree_sample_count(end) == 0);
-assert(sum(degree_sample_count) == M*d); % Number of samples necessary
-degree_sample_count(end) = [];
-
-for n = 0:max_degree
-  u = rand([degree_sample_count(n+1) 1]);
-  if numel(u) > 0
-    inds = find(bin_indices==n+1);
-
-    % Sample and place in appropriate locations in x
-    x(inds) = univ_inv(u, n);
-  end
-end
+%max_degree = max(Lambdas(:));
+%
+%[degree_sample_count, bin_indices] = histc( degrees , (0:(max_degree+1)) - 0.5 );
+%assert(degree_sample_count(end) == 0);
+%assert(sum(degree_sample_count) == M*d); % Number of samples necessary
+%degree_sample_count(end) = [];
+%
+%for n = 0:max_degree
+%  u = rand([degree_sample_count(n+1) 1]);
+%  if numel(u) > 0
+%    inds = find(bin_indices==n+1);
+%
+%    % Sample and place in appropriate locations in x
+%    x(inds) = univ_inv(u, n);
+%  end
+%end

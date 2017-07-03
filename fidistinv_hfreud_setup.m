@@ -1,28 +1,33 @@
 function[data] = fidistinv_hfreud_setup(n, alph, rho, data)
 % data = fidistinv_hfreud_setup(n, alph, rho, data)
 %
-% Computes coefficients for a piecewise cubic interpolant of the degree-n
-% induced distribution for half-Freud weights. These coefficients are appended
-% to the data cell array, inside data{n+1}.
+% Setup computations for a Fast Induced Distribution Inverse routine for
+% half-line Freud weights.
+%
+% Computes coefficients for a piecewise Chebyshev interpolant of the degree-n
+% induced distribution for half-line Freud weights. These coefficients are
+% appended to the data cell array, inside data{n+1}.
 %
 % This function also computes the "downward closed" data, that is, if
 % length(data)==k, meaning data up to degree k-1 is present, then this function
-% computes and stores data for degrees k, k+1, ..., n.
+% also computes and stores data for degrees k, k+1, ..., n.
 
 ns = length(data):n;
 if numel(ns) < 1
   return
 end
 
-% Number of points per sub interval in x
-Q = 20;
-xtemplate = linspace(0, 1, Q); xtemplate(1) = [];
-xtemplate = (sort(cos(pi*xtemplate)) + 1)/2;
+% Number of Chebyshev coefficients per subinterval
+N = 31;
 
-% Enrich with R points equidistantly in both x and u 
-R = 100;
+%%%% Generate Chebyshev grid + transform
+xgrid = flipud(cos(pi*(2*(0:(N-1)).'+1)/(2*N))); % equals gauss qaudrature nodes
+[aa,bb] = jacobi_recurrence(N+1, -1/2, -1/2);
+chebxform = poly_eval(aa, bb, xgrid, N-1);
+chebxform = (diag(1./sum(chebxform.^2, 2))*chebxform).';
+%%%%
 
-fprintf('One-time setup computations: Computing primitive data for...\n');
+fprintf('One-time setup computations: Computing induced distribution data for...\n');
 
 % Construct piecewise polynomial data
 for q = 1:length(ns)
@@ -30,75 +35,86 @@ for q = 1:length(ns)
   nn = ns(q);
 
   fprintf('n = %d...\n', nn);
-  
-  % The data points we'll choose are as follows:
-  % 2*nn+1 equally spaced data on u
-  % Q data points on each interval bounded by zeros of p_nn (Q*(nn+1) + 1 points)
 
   [a,b] = hfreud_recurrence(nn+1, alph, rho);
-  x = gauss_quadrature(a, b, nn);
+  xg = gauss_quadrature(a,b,nn);
+  ug = idist_hfreud(xg, nn, alph, rho, 100); % Make it very accurate
 
+  us = [0;  ug;  1 - 5*eps];
+  midpts = 1/2*( us(1:end-1) + us(2:end) );
+  temp = idistinv_hfreud(midpts, n, alph, rho);
 
-  x = [0; x; (maxapprox_hfreud(alph, rho, nn):hfreud_tolerance(nn, alph, rho, eps)).'];
-  %x = [0; x; (half_freud_mrs_max_guess(alph, rho, n):half_freud_effective_limit(n, alph, rho, 1e-16)).'];
+  [us, inds] = sort([0; ug; 1; midpts]);
+  xs = [0; xg; idistinv_hfreud(1-5*eps, n, alph, rho); temp];
+  xs = xs(inds);
 
-  % Create Q-1 points per interval
-  xn = diff(x) * xtemplate + repmat(x(1:end-1), [1 Q-1]);
-  xn = [reshape(xn.', [numel(xn) 1]); x(end)];
-  X = numel(xn);
+  dat = zeros([4+N 2*(nn+1)]);
+  % Data in each col: 
+  % ucenter, xcenter, exponent, scale (1-4)
+  % coeffs (5-end)
 
-  un = zeros(size(xn));
-  un = idist_hfreud(xn, nn, alph, rho);
-  %for qq = 1:X
-  %  un(qq) = gfreud_induced_primitive(xn(qq), nn, alph, rho);
-  %end
+  for j=1:(nn+1)
+    i1 = 2*j-1;
+    i2 = 2*j;
 
-  % Now nn*R data points equally-spaced in u space
-  temp = linspace(0, 1, R + 2).';
-  temp([1 end]) = [];
+    exponents = [2/3 2/3];
 
-  un = [un; temp];
-  %xn = [xn; gfreud_primitive_inverse(temp, nn, alph, rho)];
-  xn = [xn; idistinv_hfreud(temp, nn, alph, rho)];
+    uleft = us(i1);
+    ucenter = us(i2);
+    uright = us(i2+1);
 
-  % Now nn*R data points equally-spaced in x space
-  temp = linspace(x(1), x(end), R+2).';
-  temp([1 end]) = [];
+    xleft = xs(i1);
+    xcenter = xs(i2);
+    xright = xs(i2+1);
 
-  X = numel(xn);
-  xn = [xn; temp];
-  un = [un; zeros(size(temp))];
-  un((X+1):numel(xn)) = idist_hfreud(xn((X+1):numel(xn)), nn, alph, rho);
-  %for qq = (X+1):numel(xn);
-  %  un(qq) = gfreud_induced_primitive(xn(qq), nn, alph, rho);
-  %end
-
-  % Sort
-  [xn, inds] = sort(xn);
-  un = un(inds);
-
-  % Some non-monotonic behavior happens very close to u=1. Remove these.
-  while true
-    inds = [false; diff(un) < 0];
-    if not(any(inds))
-      break
+    if j == 1
+      exponents(1) = rho/(rho+1);
     end
-    un(inds) = [];
-    xn(inds) = [];
+    if j==(nn+1)
+      exponents(2) = 1;
+    end
+
+    ucenters(1) = uleft;
+    ucenters(2) = uright;
+
+    xcenters(1) = xleft;
+    xcenters(2) = xright;
+
+    scales(1) = (xcenter - xcenters(1)) .* abs( ucenter - ucenters(1)).^exponents(1);
+
+    if j < nn+1
+      scales(2) = (xcenters(2) - xcenter ) .* abs( ucenter - ucenters(2)).^exponents(2);
+    else
+      scales(2) = abs(xcenter./log(1 - ucenter).^(1/alph).*abs(1-ucenter).^exponents(2));
+    end
+
+
+    % i1 coeffs
+    ugrid = (xgrid+1)/2*(ucenter-uleft) + uleft;
+    tgrid = idistinv_hfreud(ugrid, nn, alph, rho);
+    tgrid = (tgrid - xcenters(1)) .* abs(ugrid - ucenters(1)).^exponents(1);
+    tgrid = tgrid/scales(1)*2 - 1;
+    coeffs = chebxform*tgrid;
+
+    dat(:,i1) = [ucenters(1); xcenters(1); exponents(1); scales(1); coeffs];
+
+    % i2 coeffs
+    ugrid = (xgrid+1)/2*(uright-ucenter) + ucenter;
+    tgrid = idistinv_hfreud(ugrid, nn, alph, rho);
+    if j < nn+1
+      tgrid = (tgrid - xcenters(2)) .* abs(ugrid - ucenters(2)).^exponents(2);
+      tgrid = tgrid/scales(2)*2 +1;
+    else
+      tgrid = tgrid./log(1-ugrid).^(1/alph).* abs(1 - ugrid).^exponents(2);;
+      tgrid = tgrid/scales(2)*2 +1;
+    end
+    coeffs = chebxform*tgrid;
+
+    dat(:,i2) = [ucenters(2); xcenters(2); exponents(2); scales(2); coeffs];
+
   end
 
-  % Remove identical x values
-  while true
-    inds = [false; diff(xn) <= 0];
-    if not(any(inds))
-      break
-    end
-    un(inds) = [];
-    xn(inds) = [];
-  end
-
-  data{nn+1} = pchip(xn, un);
-  data{nn+1}.u = un;
+  data{nn+1} = dat;
 
 end
 fprintf('Done\n');

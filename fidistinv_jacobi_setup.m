@@ -42,7 +42,7 @@ for q = 1:length(ns)
 
   us = [0;  ug;  1];
   midpts = 1/2*( us(1:end-1) + us(2:end) );
-  temp = idistinv_jacobi(midpts, n, alph, bet);
+  temp = idistinv_jacobi(midpts, nn, alph, bet);
 
   [us, inds] = sort([0; ug; 1; midpts]);
   xs = [-1; xg; 1; temp];
