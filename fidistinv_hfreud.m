@@ -63,6 +63,7 @@ for qn = 1:(length(indsep)+1)
   if any(j==0)
     error('Input values u must be between 0 and 1');
   end
+  j(j==numel(us)) = numel(us) - 1;
 
   % Chebyshev setup + eval
   [aa,bb] = jacobi_recurrence(N+1, -1/2, -1/2);
@@ -97,10 +98,13 @@ for qn = 1:(length(indsep)+1)
 
     temp = V(currinds,:)*data{nn+1}(5:end,j);
     if mod(j,2) == 0
+      flags = abs(v(currinds)-1) < 1e-8; % These are really close to uright
       sgn = -1;
     else
+      flags = abs(v(currinds)+1) < 1e-8; % There are really close to uleft
       sgn = +1;
     end
+
     if j < 2*(nn+1)
       temp = (temp + sgn)/2*data{nn+1}(4,j) ./ abs( uu(currinds) - data{nn+1}(1,j)).^data{nn+1}(3,j);
       temp = temp + data{nn+1}(2,j);
@@ -108,6 +112,8 @@ for qn = 1:(length(indsep)+1)
       temp = (temp + sgn)/2*data{nn+1}(4,j) .* log( 1 - uu(currinds) ).^(1/alph) ./ abs(1 - uu(currinds)).^data{nn+1}(3,j);
       %temp = 0;
     end
+
+    temp(flags) = data{nn+1}(2,j); % Peg to x endpoint
 
     xx(currinds) = temp;
 

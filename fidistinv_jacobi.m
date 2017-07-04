@@ -65,12 +65,13 @@ for qn = 1:(length(indsep)+1)
   if any(j==0)
     error('Input values u must be between 0 and 1');
   end
+  j(j==numel(us)) = numel(us) - 1;
 
   % Chebyshev setup + eval
   [aa,bb] = jacobi_recurrence(N+1, -1/2, -1/2);
   v = (uu - us(j))./(us(j+1) - us(j)) * 2 - 1;
   V = poly_eval(aa, bb, v, N-1);
-
+  
   % Partition based on values of j
   [jsorted, jinds] = sort(j);
   jindsep = find(diff(jsorted) > 0) + 1;
@@ -99,12 +100,17 @@ for qn = 1:(length(indsep)+1)
 
     temp = V(currinds,:)*data{nn+1}(5:end,j);
     if mod(j,2) == 0
+      flags = abs(v(currinds)-1) < 1e-8; % These are really close to uright
       sgn = -1;
     else
+      flags = abs(v(currinds)+1) < 1e-8; % There are really close to uleft
       sgn = +1;
     end
+
     temp = (temp + sgn)/2*data{nn+1}(4,j) ./ abs( uu(currinds) - data{nn+1}(1,j)).^data{nn+1}(3,j);
     temp = temp + data{nn+1}(2,j);
+
+    temp(flags) = data{nn+1}(2,j); % Peg to x endpoint
 
     xx(currinds) = temp;
 
