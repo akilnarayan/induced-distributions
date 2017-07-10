@@ -15,7 +15,7 @@ function[F] = idist_hfreud(x, n, alph, rho, M)
 %   and Gauss quadrature, the ending Gauss quadrature has M points.
 
 assert(rho > -1);
-assert( all(x >= 0) );
+assert( all(x(:) >= 0) );
 assert(n >= 0);
 
 if numel(x) == 0

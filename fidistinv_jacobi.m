@@ -28,7 +28,7 @@ if numel(n) > 1
   indsep = find(diff(nsorted) > 0) + 1;
 else
   nsorted = n;
-  inds = 1:numel(u);
+  inds = (1:numel(u)).';
   indsep = [];
 end
 
@@ -51,6 +51,7 @@ for qn = 1:(length(indsep)+1)
   nn = nsorted(i1);
   curr_ninds = inds(i1:i2);
   uu = u(curr_ninds);
+  uu = uu(:);
 
   % For this n value (=nn), compute Finv(uu)
   M = size(data{nn+1},2);
