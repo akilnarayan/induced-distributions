@@ -9,9 +9,9 @@ function[x] = fidistinv_freud(u, n, alph, rho)
 %
 % Supports vectorization in u.
 
-assert( (all(u) >= 0) && (all(u) <=1 ) );
+assert( (all(u(:)) >= 0) && (all(u(:)) <=1 ) );
 assert( (alph > 0) && (rho > -1) );
-assert( all( n >= 0 ) );
+assert( all( n(:) >= 0 ) );
 
 if numel(u) == 0
   x = []; 

@@ -18,6 +18,9 @@ if length(data) < max(n(:))+1
 end
 
 x = zeros(size(u));
+if numel(u) == 0
+  return
+end
 %u = reshape(u, [numel(u) 1]);
 
 if numel(n) > 1
