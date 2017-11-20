@@ -1,4 +1,4 @@
-function[x] = fidistinv_hfreud(u, n, alph, rho, data);
+function[x] = fidistinv_hfreud(u, n, alph, rho)
 % [x] = fidistinv_hfreud(u, n, alph, rho)
 %
 % A Fast Induced Distribution Inverse routine for Half-line Freud weights.
@@ -101,6 +101,7 @@ for qn = 1:(length(indsep)+1)
     currinds = jinds(i1:i2);
 
     temp = V(currinds,:)*data{nn+1}(5:end,j);
+    
     if mod(j,2) == 0
       flags = abs(v(currinds)-1) < 1e-8; % These are really close to uright
       sgn = -1;
@@ -112,13 +113,13 @@ for qn = 1:(length(indsep)+1)
     if j < 2*(nn+1)
       temp = (temp + sgn)/2*data{nn+1}(4,j) ./ abs( uu(currinds) - data{nn+1}(1,j)).^data{nn+1}(3,j);
       temp = temp + data{nn+1}(2,j);
+
     else
+      temp(temp > 1) = 1-1e-5; % TODO: This is a bad fix based on a poor approximation at RHS
       temp = (temp + sgn)/2*data{nn+1}(4,j) .* log( 1 - uu(currinds) ).^(1/alph) ./ abs(1 - uu(currinds)).^data{nn+1}(3,j);
-      %temp = 0;
     end
 
     temp(flags) = data{nn+1}(2,j); % Peg to x endpoint
-
     xx(currinds) = temp;
 
   end

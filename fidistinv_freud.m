@@ -14,7 +14,7 @@ assert( (alph > 0) && (rho > -1) );
 assert( all( n(:) >= 0 ) );
 
 if numel(u) == 0
-  x = []; 
+  x = [];
   return
 end
 

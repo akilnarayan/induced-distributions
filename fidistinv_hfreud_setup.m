@@ -49,7 +49,7 @@ for q = 1:length(ns)
   xs = xs(inds);
 
   dat = zeros([4+N 2*(nn+1)]);
-  % Data in each col: 
+  % Data in each col:
   % ucenter, xcenter, exponent, scale (1-4)
   % coeffs (5-end)
 
@@ -105,8 +105,13 @@ for q = 1:length(ns)
       tgrid = (tgrid - xcenters(2)) .* abs(ugrid - ucenters(2)).^exponents(2);
       tgrid = tgrid/scales(2)*2 +1;
     else
-      tgrid = tgrid./log(1-ugrid).^(1/alph).* abs(1 - ugrid).^exponents(2);;
-      tgrid = tgrid/scales(2)*2 +1;
+      tgrid = tgrid./log(1-ugrid).^(1/alph).* abs(1 - ugrid).^exponents(2);
+      tgrid = tgrid/scales(2)*2 + 1;
+
+      % TODO: Here, if x = 1, then the chebyshev interpolant can have
+      % larger magnitude than 1, which causes problems. Right now we've
+      % done a cheap hack in fidistinv_hfreud to "fix" this.
+
     end
     coeffs = chebxform*tgrid;
 

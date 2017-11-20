@@ -1,5 +1,5 @@
-function[data] = fast_jacobi_setup(n, alph, bet, data)
-% data = fast_jacobi_setup(n, alph, bet, data)
+function[data] = fidistinv_jacobi_setup(n, alph, bet, data)
+% data = fidistinv_jacobi_setup(n, alph, bet, data)
 %
 % Setup computations for a Fast Induced Distribution Inverse routine for Jacobi
 % weights.

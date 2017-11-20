@@ -56,6 +56,6 @@ for q = 2:N
   r(:,q) = r1;
 end
 
-if numel(nx) == 1
+if nx == 1
   r = r(:);
 end

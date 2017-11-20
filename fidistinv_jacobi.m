@@ -75,7 +75,7 @@ for qn = 1:(length(indsep)+1)
   [aa,bb] = jacobi_recurrence(N+1, -1/2, -1/2);
   v = (uu - us(j))./(us(j+1) - us(j)) * 2 - 1;
   V = poly_eval(aa, bb, v, N-1);
-  
+
   % Partition based on values of j
   [jsorted, jinds] = sort(j);
   jindsep = find(diff(jsorted) > 0) + 1;
