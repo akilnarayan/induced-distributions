@@ -309,7 +309,8 @@ if __name__ == "__main__":
     rho = 0.
     x = fidistinv_freud(u, n, alpha, rho)
     # Answer from matlab:
-    xexact = [-13.678632570548212,  -1.523421749424622,  -1.668998069614316 , -1.728340302085786,  -0.993630459736883,                   0, 1.004265363591295  , 2.206804803887962 ,  3.417302103995057,   4.003844362463795,  23.774500614967632]
+    xexact = [-13.678632570548212,  -1.523421749424622,  -1.668998069614316 , -1.728340302085786,  -0.993630459736883,                   0, 1.004265363591295  , 2.206804803887962 ,  3.417302103995057,   4.003844362463795,  9.511595009270319]
+            
     print "Hermite error: {:.4e}".format(np.linalg.norm(x - xexact))
 
     # Testing random sampling from induced mixture (tensorial)
@@ -330,7 +331,6 @@ if __name__ == "__main__":
     plt.figure()
     plt.plot(np.sort(x), np.arange(x.size,dtype=float)/x.size)
     plt.title('CDF for Hermite, k={:d}'.format(k))
-    plt.show()
 
     x = idist_mixture_sampling_tensorial(M, 5, k, "freud", alpha=alpha, rho=rho)
 
@@ -354,3 +354,5 @@ if __name__ == "__main__":
     V = opolynd.opolynd_eval(x, L, ab)
     # Christoffel preconditioner
     V = (V.T* np.sqrt( (k+1.)**2. / np.sum(V**2, axis=1))).T
+
+    plt.show()
