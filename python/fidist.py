@@ -31,7 +31,7 @@ def loadfile_jacobi(filename, alpha, beta, n):
         command += "save_fjacobi(data, {:.4f}, {:.4f}); ".format(alpha, beta)
 
         command += "exit"
-        print command
+        #print command
 
         subprocess.call([matlab_binary, "-nodisplay", "-r", command])
         print "...finished"
@@ -309,7 +309,8 @@ if __name__ == "__main__":
     rho = 0.
     x = fidistinv_freud(u, n, alpha, rho)
     # Answer from matlab:
-    xexact = [-13.678632570548212,  -1.523421749424622,  -1.668998069614316 , -1.728340302085786,  -0.993630459736883,                   0, 1.004265363591295  , 2.206804803887962 ,  3.417302103995057,   4.003844362463795,  9.511595009270319]
+    xexact = [ -8.044290960636985,  -1.523421749424712 , -1.668998069614480 , -1.728340302085805 , -0.993630459736906,                   0, 1.004265363591303,   2.206804803887973,   3.417302103995109,   4.003844362463767,   9.511595009270319]
+
             
     print "Hermite error: {:.4e}".format(np.linalg.norm(x - xexact))
 
