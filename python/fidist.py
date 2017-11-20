@@ -6,6 +6,7 @@ from scipy.io import loadmat
 
 import opoly1d
 
+# Matlab binary location:
 matlab_binary = '/Applications/MATLAB_R2015b.app/bin/matlab'
 data_directory = '../data/'
 
@@ -250,7 +251,7 @@ def idist_mixture_sampling_tensorial(M, d, k, disttype, **kwargs):
 
     # Tensorial is easy: all coordinates have the same distribution.
     u = np.random.rand(M*d)
-    n = np.floor((k+1)*np.random.rand(M*d))
+    n = np.floor((k+1)*np.random.rand(M*d)).astype(int)
     n[n==(k+1)] = k
 
     if disttype == "jacobi":
