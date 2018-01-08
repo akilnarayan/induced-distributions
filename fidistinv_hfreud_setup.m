@@ -18,16 +18,10 @@ if numel(ns) < 1
 end
 
 % Number of Chebyshev coefficients per subinterval
-N = 31;
+M = 50;
+tol = 1e-12;
 
-%%%% Generate Chebyshev grid + transform
-xgrid = flipud(cos(pi*(2*(0:(N-1)).'+1)/(2*N))); % equals gauss qaudrature nodes
-[aa,bb] = jacobi_recurrence(N+1, -1/2, -1/2);
-chebxform = poly_eval(aa, bb, xgrid, N-1);
-chebxform = (diag(1./sum(chebxform.^2, 2))*chebxform).';
-%%%%
-
-fprintf('One-time setup computations: Computing induced distribution data for...\n');
+fprintf('One-time setup computations: Computing Half-Freud (alpha=%1.3f, rho=%1.3f) induced distribution data for...\n', alph, rho);
 
 % Construct piecewise polynomial data
 for q = 1:length(ns)
@@ -36,89 +30,29 @@ for q = 1:length(ns)
 
   fprintf('n = %d...\n', nn);
 
-  [a,b] = hfreud_recurrence(nn+1, alph, rho);
-  xg = gauss_quadrature(a,b,nn);
-  ug = idist_hfreud(xg, nn, alph, rho, 100); % Make it very accurate
+  [a,b] = hfreud_recurrence(2*nn, alph, rho);
+  b(1) = 1;
 
-  us = [0;  ug;  1 - 5*eps];
-  midpts = 1/2*( us(1:end-1) + us(2:end) );
-  temp = idistinv_hfreud(midpts, n, alph, rho);
+  xg = [0; gauss_quadrature(a, b, nn)];
+  ug = idist_hfreud(xg, nn, alph, rho);
 
-  [us, inds] = sort([0; ug; 1; midpts]);
-  xs = [0; xg; idistinv_hfreud(1-5*eps, n, alph, rho); temp];
-  xs = xs(inds);
+  % Also need Inf on the RHS -- just put dummy in for x for now
+  ug = [ug; 1-tol];
 
-  dat = zeros([4+N 2*(nn+1)]);
-  % Data in each col:
-  % ucenter, xcenter, exponent, scale (1-4)
-  % coeffs (5-end)
+  % Exponents for left- and right-hand sides
+  exps = [rho/(rho+1), 2/3]; % the 2/3 is empirical
+  [ug, exponents] = fidistinv_setup_helper1(ug, exps);
+  
+  % Insert some breakpoints between the penultimate and ultimate points
+  M = 10; % Number of subintervals spanning last interval
+  utemp = 1 - logspace(log10(1 - ug(end-1)), log10(1 - ug(end)), M+1).';
+  ug = [ug(1:(end-2)); utemp];
 
-  for j=1:(nn+1)
-    i1 = 2*j-1;
-    i2 = 2*j;
+  exponents = [exponents [zeros([1 M-1]); 2/3*ones([1 M-1])]]; % empirical
 
-    exponents = [2/3 2/3];
-
-    uleft = us(i1);
-    ucenter = us(i2);
-    uright = us(i2+1);
-
-    xleft = xs(i1);
-    xcenter = xs(i2);
-    xright = xs(i2+1);
-
-    if j == 1
-      exponents(1) = rho/(rho+1);
-    end
-    if j==(nn+1)
-      exponents(2) = 1;
-    end
-
-    ucenters(1) = uleft;
-    ucenters(2) = uright;
-
-    xcenters(1) = xleft;
-    xcenters(2) = xright;
-
-    scales(1) = (xcenter - xcenters(1)) .* abs( ucenter - ucenters(1)).^exponents(1);
-
-    if j < nn+1
-      scales(2) = (xcenters(2) - xcenter ) .* abs( ucenter - ucenters(2)).^exponents(2);
-    else
-      scales(2) = abs(xcenter./log(1 - ucenter).^(1/alph).*abs(1-ucenter).^exponents(2));
-    end
-
-
-    % i1 coeffs
-    ugrid = (xgrid+1)/2*(ucenter-uleft) + uleft;
-    tgrid = idistinv_hfreud(ugrid, nn, alph, rho);
-    tgrid = (tgrid - xcenters(1)) .* abs(ugrid - ucenters(1)).^exponents(1);
-    tgrid = tgrid/scales(1)*2 - 1;
-    coeffs = chebxform*tgrid;
-
-    dat(:,i1) = [ucenters(1); xcenters(1); exponents(1); scales(1); coeffs];
-
-    % i2 coeffs
-    ugrid = (xgrid+1)/2*(uright-ucenter) + ucenter;
-    tgrid = idistinv_hfreud(ugrid, nn, alph, rho);
-    if j < nn+1
-      tgrid = (tgrid - xcenters(2)) .* abs(ugrid - ucenters(2)).^exponents(2);
-      tgrid = tgrid/scales(2)*2 +1;
-    else
-      tgrid = tgrid./log(1-ugrid).^(1/alph).* abs(1 - ugrid).^exponents(2);;
-      tgrid = tgrid/scales(2)*2 +1;
-      % TODO: Here, if x = 1, then the chebyshev interpolant can have
-      % larger magnitude than 1, which causes problems. Right now we've
-      % done a cheap hack in fidistinv_hfreud to "fix" this.
-
-    end
-    coeffs = chebxform*tgrid;
-
-    dat(:,i2) = [ucenters(2); xcenters(2); exponents(2); scales(2); coeffs];
-
-  end
-
-  data{nn+1} = dat;
-
+  idistinv = @(uu) idistinv_hfreud(uu, nn, alph, rho);
+  M = 50; % Size of Chebyshev transform
+  data{nn+1} = fidistinv_setup_helper2(ug, idistinv, exponents, M);
+  
 end
 fprintf('Done\n');

@@ -2,7 +2,7 @@ function[C] = C_eval(a, b, x, N)
 % C_eval -- Evaluates Christoffel-normalized orthogonal polynomials
 %
 % C = C_eval(a, b, x, N)
-%   Uses the recurrence coefficients a and b to evaluate C_n(x), 
+%   Uses the recurrence coefficients a and b to evaluate C_n(x),
 %   defined as
 %
 %    C_n(x) = p_n(x) / sqrt(sum_{j=0}^{n-1} p_j^2(x)),

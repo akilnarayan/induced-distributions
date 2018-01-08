@@ -1,7 +1,7 @@
 function[x,w] = gauss_quadrature(a,b,N)
 % gauss_quadrature -- Computes Gauss quadrature from recurrence coefficients
 %
-% [x,w] = gauss_quadrature(a,b)
+% [x,w] = gauss_quadrature(a,b,N)
 %
 %     Computes N Gauss quadrature nodes (x) and weights (w) from length-N arrays
 %     a and b containing the standard orthonormal recurrence coefficients of the
