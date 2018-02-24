@@ -14,12 +14,12 @@ if length(u) == 0
 end
 
 nscalar = false;
+n = reshape(n, [numel(n) 1]);
 if (length(u) ~= length(n)) && (length(n) ~= 1)
   error('Inputs u and n must be the same size, or n must be a scalar')
 else
   nscalar = true;
 end
-n = reshape(n, [numel(n) 1]);
 
 N = max(n);
 assert(length(data) >= N+1, 'Input data does not cover range of n');
