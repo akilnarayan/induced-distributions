@@ -36,3 +36,5 @@ univ_inv = @(uu,nn) fidistinv_jacobi(uu, nn, alph, bet);
 tic;
 xf2 = idist_mixture_sampling(N, lambdas, univ_inv);
 ftime2 = toc/N;
+
+% norm(x - xf) should be small, but x2 and xf2 are completely different because of randomization.

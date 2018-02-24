@@ -16,7 +16,7 @@ function[F] = idist_jacobi(x, n, alph, bet, M)
 
 assert((alph > -1) && (bet > -1));
 assert( all(abs(x(:)) <= 1) );
-assert( (n >= 0) && (numel(n) == 1) );
+assert( all(n(:) >= 0) && (numel(n) == 1) );
 
 if numel(x) == 0
   F = [];

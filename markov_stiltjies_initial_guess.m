@@ -14,7 +14,7 @@ function[intervals] = markov_stiltjies_initial_guess(u, n, a, b, supp)
 % row m the bounding interval for u = u(m).
 
 assert(numel(a) == numel(b));
-assert(numel(a) > 2*n);
+assert(numel(a) > 2*max(n(:)));
 
 % Compute quadratic modifications modifications.
 [x,w] = gauss_quadrature(a, b, n);

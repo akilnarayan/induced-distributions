@@ -21,7 +21,17 @@ if isempty(options)
   options.TolX = 10*eps;
 end
 
-intervals = markov_stiltjies_initial_guess(u, n, a, b, supp);
+if numel(n) == 1
+  intervals = markov_stiltjies_initial_guess(u, n, a, b, supp);
+else
+  intervals = zeros([numel(n) 2]);
+  nmax = max(n(:));
+  [nn, ~, bin] = histcounts(n, -0.5:(0.5+nmax));
+  for qq = 0:max(n(:))
+    flags = bin==(qq+1);
+    intervals(flags,:) = markov_stiltjies_initial_guess(u(flags), qq, a, b, supp);
+  end
+end
 
 x = zeros(size(u));
 

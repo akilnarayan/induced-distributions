@@ -16,7 +16,7 @@ function[F] = idist_hfreud(x, n, alph, rho, M)
 
 assert(rho > -1);
 assert( all(x(:) >= 0) );
-assert(n >= 0);
+assert(all(n(:)) >= 0);
 
 if numel(x) == 0
   F = [];
